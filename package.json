@@ -1,0 +1,25 @@
+{
+  "name": "ddos",
+  "version": "1.0.0",
+  "description": "DDos resource server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ddos",
+    "node"
+  ],
+  "author": "franko4don@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-rate-limit": "^5.5.0",
+    "moment": "^2.29.1",
+    "prom-client": "^12.0.0",
+    "redis": "^3.1.2",
+    "swagger-stats": "^0.99.2",
+    "util": "^0.12.4"
+  }
+}
