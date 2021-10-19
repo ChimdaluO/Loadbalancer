@@ -49,7 +49,7 @@ app.get('*', async (req, res) => {
     client.set(ip, JSON.stringify([Date.now()]))
   }
   // return res.redirect(`http://localhost:3000${req.path}`)
-  return res.redirect(`http://35.222.103.32:3000${req.path}`)
+  return res.redirect(`http://104.198.202.41:3000${req.path}`)
 });
 
 
