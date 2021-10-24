@@ -1,16 +1,16 @@
 const express = require('express');
 const moment = require('moment');
 
+// collects the metrics and exposes it to prometheus
 const swStats = require('swagger-stats');
-// const apiSpec = require('swagger.json');
-
 
 const rps = 25;
 const app = express();
 app.use(express.json({ limit: '400mb' }));
 app.use(express.urlencoded({ limit: '400mb', extended: true }));
+app.use(swStats.getMiddleware());
 
-
+// handles blockchain connection
 const Web3 = require('web3');
 let privateKey = "77a4b285b18085352ce2b8695674c46a1ab42179ecdaf078cc8c7063575b69a8"; // provide private key from okide metamask wallet: iff need to import more blacklist here
 let ipDictionary = {};
@@ -24,11 +24,10 @@ creatorWalletAddress = web3.eth.accounts.wallet[0].address;
 
 const blacklists = new web3.eth.Contract(abi_array, contracts_address);
 let timestampLists = [];
+let ipBlackLists = [];
 
 async function getBlacklistCount(){
   let blacklistCounts = await blacklists.methods.BlackListCount().call();
-  
-  let ipBlackLists = [];
   
   for (var i = 1; i <= blacklistCounts; i++) {
       const blacklist = await blacklists.methods.ipBlackLists(i).call();
@@ -50,7 +49,9 @@ async function addIpToBlacklist(ips, timestamps){
     });
 }
 
+
 getBlacklistCount()
+// block chain processes and functions ends here
 
 const redis = require("redis");
 const client = redis.createClient();
@@ -66,22 +67,26 @@ client.on("error", function(error) {
 
 let count = 0;
 
-app.use(swStats.getMiddleware());
+
 
 //default landing:
 app.get('*', async (req, res) => {
-  const ip = getUserIp(req)
-  const rawData = await redisGet(ip)
+  const ip = getUserIp(req) // extracts the ip from request payload
+  const rawData = await redisGet(ip) // get ip address from redis
   const time = Date.now()
   if(ipDictionary[ip]){
     return res.status(429).json({message: "Request Dropped because IP is blacklisted"})
   }
+
+  // check if ip is in Redis
   if(rawData){
-    const data = JSON.parse(rawData);
+    const data = JSON.parse(rawData); //[1335343245, 1325434242, 165543333]
 
     const result = data.filter(item => {
-      return moment(time).subtract(moment(item), 'seconds').seconds() > rps
+      return moment(time).subtract(moment(item), 'seconds').seconds() > 1
     })
+
+    // [165543333]
 
     if (result.length > rps){
       ipDictionary[ip] = time
@@ -96,8 +101,8 @@ app.get('*', async (req, res) => {
     
     client.set(ip, JSON.stringify([Date.now()]))
   }
-  // return res.redirect(`http://localhost:3000${req.path}`)
-  return res.redirect(`http://104.198.202.41:3000${req.path}`)
+  return res.redirect(`http://localhost:3000${req.path}`)
+  // return res.redirect(`http://104.198.202.41:3000${req.path}`)
 });
 
 
