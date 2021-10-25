@@ -106,7 +106,7 @@ app.get('*', async (req, res) => {
 });
 
 
-const PORT = 3001;
+const PORT = 3002;
 app.on('error', (err) => {
     console.error(`Express server error ${err}`);
 });
