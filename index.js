@@ -83,7 +83,7 @@ app.get('*', async (req, res) => {
     const data = JSON.parse(rawData); //[1335343245, 1325434242, 165543333]
 
     const result = data.filter(item => {
-      return moment(time).subtract(moment(item), 'seconds').seconds() > 1
+      return moment(time).subtract(moment(item), 'seconds').seconds() < 1
     })
 
     // [165543333]
