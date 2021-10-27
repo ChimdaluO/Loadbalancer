@@ -4,7 +4,7 @@ const moment = require('moment');
 // collects the metrics and exposes it to prometheus
 const swStats = require('swagger-stats');
 
-const rps = 25;
+const rps = 5;
 const app = express();
 app.use(express.json({ limit: '400mb' }));
 app.use(express.urlencoded({ limit: '400mb', extended: true }));
@@ -83,12 +83,14 @@ app.get('*', async (req, res) => {
     const data = JSON.parse(rawData); //[1335343245, 1325434242, 165543333]
 
     const result = data.filter(item => {
-      return moment(time).subtract(moment(item), 'seconds').seconds() < 1
+      const diff = (time - item) / 1000
+      // console.log(diff)
+      return diff < (1/rps)
     })
 
     // [165543333]
-
     if (result.length > rps){
+      
       ipDictionary[ip] = time
       ipBlackLists.push(ip)
       timestampLists.push(time+'')
@@ -101,8 +103,8 @@ app.get('*', async (req, res) => {
     
     client.set(ip, JSON.stringify([Date.now()]))
   }
-  // return res.redirect(`http://localhost:3000${req.path}`)
-  return res.redirect(`http://34.69.35.64:3000${req.path}`)
+  return res.redirect(`http://localhost:3000${req.path}`)
+  // return res.redirect(`http://34.69.35.64:3000${req.path}`)
 });
 
 
