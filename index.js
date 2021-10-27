@@ -91,7 +91,7 @@ app.get('*', async (req, res) => {
     // [165543333]
     if (result.length > rps){
       
-      ipDictionary[ip] = time
+      // ipDictionary[ip] = time
       ipBlackLists.push(ip)
       timestampLists.push(time+'')
       return res.status(429).json({message: "Request Dropped by IPS"})
