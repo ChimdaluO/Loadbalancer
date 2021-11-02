@@ -3,7 +3,7 @@ const moment = require('moment');
 
 // collects the metrics and exposes it to prometheus
 const swStats = require('swagger-stats');
-var apispec = require("./swagger.json")
+var apiSpec = require("./swagger.json")
 
 const rps = 5;
 const app = express();
