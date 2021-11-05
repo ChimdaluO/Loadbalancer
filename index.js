@@ -3,12 +3,13 @@ const moment = require('moment');
 
 // collects the metrics and exposes it to prometheus
 const swStats = require('swagger-stats');
+var apiSpec = require("./swagger.json")
 
 const rps = 25;
 const app = express();
 app.use(express.json({ limit: '400mb' }));
 app.use(express.urlencoded({ limit: '400mb', extended: true }));
-app.use(swStats.getMiddleware());
+app.use(swStats.getMiddleware({swaggerSpec:apiSpec}));
 
 // handles blockchain connection
 const Web3 = require('web3');
