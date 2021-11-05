@@ -4,7 +4,7 @@ const moment = require('moment');
 // collects the metrics and exposes it to prometheus
 const swStats = require('swagger-stats');
 
-const rps = 5;
+const rps = 25;
 const app = express();
 app.use(express.json({ limit: '400mb' }));
 app.use(express.urlencoded({ limit: '400mb', extended: true }));
@@ -81,7 +81,7 @@ app.get('*', async (req, res) => {
   // check if ip is in Redis
   if(rawData){
     const data = JSON.parse(rawData); //[1335343245, 1325434242, 165543333]
-
+    console.log(data, data.length)
     const result = data.filter(item => {
       const diff = (time - item) / 1000
       // console.log(diff)
