@@ -6,6 +6,7 @@ const swStats = require('swagger-stats');
 var apiSpec = require("./swagger.json")
 
 const rps = 25;
+const totalRequestPerSecond = 1000
 const app = express();
 app.use(express.json({ limit: '400mb' }));
 app.use(express.urlencoded({ limit: '400mb', extended: true }));
@@ -66,9 +67,6 @@ client.on("error", function(error) {
   console.error(error);
 });
 
-let count = 0;
-
-
 
 //default landing:
 app.get('*', async (req, res) => {
@@ -76,17 +74,18 @@ app.get('*', async (req, res) => {
   const rawData = await redisGet(ip) // get ip address from redis
   const time = Date.now()
   if(ipDictionary[ip]){
-    return res.status(429).json({message: "Request Dropped because IP is blacklisted"})
+    // console.log(`Request Dropped by IPS ${ip}`)
+    return res.status(429).json({message: `Request Dropped because IP is blacklisted ${ip}`})
   }
 
   // check if ip is in Redis
   if(rawData){
     const data = JSON.parse(rawData); //[1335343245, 1325434242, 165543333]
-    console.log(data, data.length)
+    // console.log(data, data.length)
     const result = data.filter(item => {
       const diff = (time - item) / 1000
       // console.log(diff)
-      return diff < (1/rps)
+      return diff < 1
     })
 
     // [165543333]
@@ -95,7 +94,8 @@ app.get('*', async (req, res) => {
       // ipDictionary[ip] = time
       ipBlackLists.push(ip)
       timestampLists.push(time+'')
-      return res.status(429).json({message: "Request Dropped by IPS"})
+      // console.log(`Request Dropped by IPS ${ip}`)
+      return res.status(429).json({message: `Request Dropped by IPS ${ip}`})
     }
     result.push(time)
     client.set(ip, JSON.stringify(result))
@@ -104,6 +104,7 @@ app.get('*', async (req, res) => {
     
     client.set(ip, JSON.stringify([Date.now()]))
   }
+  // console.log(`I am available ${ip}`)
   return res.redirect(`http://localhost:3000${req.path}`)
   // return res.redirect(`http://34.69.35.64:3000${req.path}`)
 });
