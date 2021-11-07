@@ -105,8 +105,8 @@ app.get('*', async (req, res) => {
     client.set(ip, JSON.stringify([Date.now()]))
   }
   // console.log(`I am available ${ip}`)
-  return res.redirect(`http://localhost:3000${req.path}`)
-  // return res.redirect(`http://34.69.35.64:3000${req.path}`)
+//   return res.redirect(`http://localhost:3000${req.path}`)
+  return res.redirect(`http://34.69.35.64:3000${req.path}`)
 });
 
 
